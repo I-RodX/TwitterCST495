@@ -12,7 +12,8 @@ class TimelineViewController: UIViewController, UITableViewDataSource {
     var tweets: [Tweet] = []
     var refreshControl: UIRefreshControl!
     @IBOutlet weak var tableView: UITableView!
-    
+    @IBOutlet weak var composeButton: UIButton!
+    @IBOutlet weak var profileButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +29,11 @@ class TimelineViewController: UIViewController, UITableViewDataSource {
         
 
         // Do any additional setup after loading the view.
+    }
+    
+    func did(post: Tweet){
+        tweets.insert(post, at: 0)
+        tableView.reloadData()
     }
     
     func fetchTweets(){
@@ -55,11 +61,34 @@ class TimelineViewController: UIViewController, UITableViewDataSource {
         APIManager.shared.logout()
     }
     
+   
+    @IBAction func didTapCompse(_ sender: Any) {
+        self.performSegue(withIdentifier: "composeSegue", sender: Any?.self)
+    }
+    
+   
+    @IBAction func didTapProfile(_ sender: Any) {
+        self.performSegue(withIdentifier: "profileSegue", sender: Any?.self)
+    }
+    
+    
     func refreshControlAction(_ refreshControl: UIRefreshControl) {
         fetchTweets()
         self.tableView.reloadData()
         refreshControl.endRefreshing()
     }
+    
+   
+   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if let detailViewController = segue.destination as? DetailViewController{
+            let cell = sender as! UITableViewCell
+            if let indexPath = tableView.indexPath(for: cell){
+                let tweet = tweets[indexPath.row]
+                detailViewController.tweet = tweet
+            }
+        } 
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
